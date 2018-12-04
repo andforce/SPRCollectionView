@@ -12,7 +12,7 @@
 #define kCollectionViewHeight (self.collectionView.frame.size.height)
 
 #define kCellHeight 200 /// cell 高度
-#define kCellSpace 100 // cell0Top to cell1Top
+#define kCellSpace 100 // 两个Cell间距
 #define kComeUpAnimationDuration 0.25
 #define kBottomAutoScrollDistance 200
 #define kTopAutoScrollDistance 100
@@ -36,12 +36,14 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 };
 
 
-@interface CollectionViewFlowLayout ()
+@interface CollectionViewFlowLayout (){
+
+}
 @property(nonatomic, strong) UIImageView *shootImageView;
 
 @property(assign, nonatomic) CGPoint longPressGesLastLocation;
 @property(nonatomic, strong) CADisplayLink *displayLink;
-@property(assign, nonatomic) BOOL isMoveing;
+@property(assign, nonatomic) BOOL isMoving;
 @property(nonatomic, strong) NSIndexPath *currentIndexPath;
 @property(weak, nonatomic) CollectionViewCell *currentCell;
 @property(assign, nonatomic) CollectionViewAutoScrollType scrollType;
@@ -52,13 +54,12 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 @implementation CollectionViewFlowLayout
 
 - (instancetype)init {
-    self = [super init];
-    if (self) {
 
-    }
+    self = [super init];
     return self;
 }
 
+#pragma Override
 - (void)prepareLayout {
     [super prepareLayout];
 //    self.estimatedItemSize = CGSizeMake(50, 50);
@@ -68,6 +69,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 
 }
 
+#pragma Override
 - (CGSize)collectionViewContentSize {
     UIEdgeInsets inset = self.collectionView.contentInset;
     NSInteger items = [self.collectionView numberOfItemsInSection:0];
@@ -75,31 +77,42 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
     return size;
 }
 
+/**
+ * 当collectionView的显示范围发生改变的时候，是否需要重新刷新布局
+ * 一旦重新刷新布局，就会重新调用下面的方法：
+ * 1.prepareLayout
+ * 2.layoutAttributesForElementsInRect:方法
+ */
+#pragma Override
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
     return YES;
 }
 
-
+#pragma Override
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
     NSInteger rows = [self.collectionView numberOfItemsInSection:0];
     CGFloat offsetY = self.collectionView.contentOffset.y;
     UIEdgeInsets inset = self.collectionView.contentInset;
-    NSMutableArray *attrs = [NSMutableArray arrayWithCapacity:0];\
+    NSMutableArray *attrs = [NSMutableArray arrayWithCapacity:0];
     // 与rect相交的最大最小item值
     int minRow = MAX(0, floor((offsetY) / kCellSpace));
     int maxRow = MIN(ceil((offsetY + self.collectionView.frame.size.height) / kCellSpace), rows);
+
+    // 底部收缩固定为4个
     int shrinkCellIndex = 0; // 缩起来cell的下标,0, 1, 2, 3
     for (int row = minRow; row < maxRow; row++) {
         // 顶部只留一个cell
         if (row * kCellSpace >= offsetY - kCellSpace) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:row inSection:0];
-            UICollectionViewLayoutAttributes *att = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+
+            UICollectionViewLayoutAttributes *collectionViewLayoutAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
             CGRect cellRect = CGRectMake(0, MAX(offsetY, row * kCellSpace), kCollectionViewWidth - inset.right, kCellHeight);
             CGFloat left = (4 - shrinkCellIndex) * 5;
             CGFloat top = shrinkCellIndex * kExpandBottomCellSpace + kExpandBottomFirstCellMarginOfTop;
             if (self.isExpand) {
                 if (indexPath.item == self.currentIndexPath.item) {
                     cellRect = CGRectMake(0, offsetY, kCollectionViewWidth - inset.right, kCollectionViewHeight - kExpandBottomHeight);
+//                    cellRect = CGRectMake(0, offsetY, kCollectionViewWidth - inset.right, kCellHeight);
                     self.currentCellShrinkMarginLeft = left;
                 } else {
                     cellRect = CGRectMake(left, offsetY + (kCollectionViewHeight - kExpandBottomHeight) + top, kCollectionViewWidth - inset.right - left * 2, kCellHeight);
@@ -109,16 +122,16 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
             } else {
                 if (offsetY < -inset.top) {
                     // 0.25是相对于offsetY的偏移比例,根据需要自行调节
-                    cellRect.origin.y = att.indexPath.item * kCellSpace - fabs(offsetY + inset.top) + fabs(offsetY + inset.top) * att.indexPath.item * 0.25;
+                    cellRect.origin.y = collectionViewLayoutAttributes.indexPath.item * kCellSpace - fabs(offsetY + inset.top) + fabs(offsetY + inset.top) * collectionViewLayoutAttributes.indexPath.item * 0.25;
                 }
             }
-            att.frame = cellRect;
-            att.center = CGPointMake(CGRectGetMinX(cellRect) + CGRectGetWidth(cellRect) / 2, CGRectGetMinY(cellRect) + CGRectGetHeight(cellRect) / 2);
+            collectionViewLayoutAttributes.frame = cellRect;
+            collectionViewLayoutAttributes.center = CGPointMake(CGRectGetMinX(cellRect) + CGRectGetWidth(cellRect) / 2, CGRectGetMinY(cellRect) + CGRectGetHeight(cellRect) / 2);
             // 因为我们的cell有重叠,必须设置zIndex,否则复用时层级会有问题
-            att.zIndex = att.indexPath.item * 2;
-            att.transform3D = CATransform3DMakeTranslation(0, 0, att.indexPath.item * 2);
+            collectionViewLayoutAttributes.zIndex = collectionViewLayoutAttributes.indexPath.item * 2;
+            collectionViewLayoutAttributes.transform3D = CATransform3DMakeTranslation(0, 0, collectionViewLayoutAttributes.indexPath.item * 2);
             if (CGRectIntersectsRect(cellRect, rect) || CGRectContainsRect(cellRect, rect)) {
-                [attrs addObject:att];
+                [attrs addObject:collectionViewLayoutAttributes];
             }
         }
     }
@@ -135,7 +148,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
             NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
             self.currentIndexPath = indexPath;
             self.currentCell = cell;
-            self.isMoveing = NO;
+            self.isMoving = NO;
             if (!self.shootImageView) {
                 self.shootImageView = [UIImageView new];
             }
@@ -287,7 +300,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
         return;
     }
 
-    if (self.isMoveing) {
+    if (self.isMoving) {
         return;
     }
 
@@ -318,7 +331,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 
 
 - (void)handlerMoveItemAction {
-    if (!self.isMoveing) {
+    if (!self.isMoving) {
         // 取到当前cell附近的cell, 判断是否可以交换
         BOOL shouldMove = NO;
         NSIndexPath *preferIndexPath;
@@ -341,7 +354,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 
         if (shouldMove && preferCell && preferIndexPath) {
             [self.collectionView performBatchUpdates:^{
-                self.isMoveing = YES;
+                self.isMoving = YES;
                 [self.collectionView moveItemAtIndexPath:self.currentIndexPath toIndexPath:preferIndexPath];
 
                 if ([self.delegate respondsToSelector:@selector(collectionViewFlowLayout:moveItemAtIndexPath:toIndexPath:)]) {
@@ -359,10 +372,10 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
                 if (self.scrollType == CollectionViewAutoScrollDown) {
                     // 头部有很多的cell,交换太快会闪屏,需要有间隔
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        self.isMoveing = NO;
+                        self.isMoving = NO;
                     });
                 } else {
-                    self.isMoveing = NO;
+                    self.isMoving = NO;
                 }
             }                             completion:^(BOOL finished) {
 
@@ -408,7 +421,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
 
     [self.collectionView performBatchUpdates:^{
         [self invalidateLayout];
-    }                             completion:^(BOOL finished) {
+    } completion:^(BOOL finished) {
         self.collectionView.scrollEnabled = NO;
     }];
 
@@ -419,7 +432,7 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
     self.currentCell.panGes.enabled = NO;
     [self.collectionView performBatchUpdates:^{
         [self invalidateLayout];
-    }                             completion:^(BOOL finished) {
+    } completion:^(BOOL finished) {
         self.collectionView.scrollEnabled = YES;
     }];
 }

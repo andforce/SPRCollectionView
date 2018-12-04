@@ -14,7 +14,7 @@ iOS:使用CollectionView实现Wallet效果
     注释掉这行代码,效果就会很明显:
     
      ```
-        if (self.isMoveing) {
+        if (self.isMoving) {
           return;
         }
      ```

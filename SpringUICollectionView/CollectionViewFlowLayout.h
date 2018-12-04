@@ -18,6 +18,7 @@
 @end
 
 @interface CollectionViewFlowLayout : UICollectionViewFlowLayout <CollectionViewCellGestureDelegate>
+
 @property(weak, nonatomic) id <CollectionViewFlowLayoutDelegate> delegate;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
