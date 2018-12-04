@@ -11,14 +11,14 @@
 
 @class CollectionViewFlowLayout;
 
-@protocol CollectionViewFlowLayoutDelagate <NSObject>
+@protocol CollectionViewFlowLayoutDelegate <NSObject>
 
 - (void)collectionViewFlowLayout:(CollectionViewFlowLayout *)flowLayout moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath;
 
 @end
 
 @interface CollectionViewFlowLayout : UICollectionViewFlowLayout <CollectionViewCellGestureDelegate>
-@property(weak, nonatomic) id <CollectionViewFlowLayoutDelagate> delagate;
+@property(weak, nonatomic) id <CollectionViewFlowLayoutDelegate> delegate;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 

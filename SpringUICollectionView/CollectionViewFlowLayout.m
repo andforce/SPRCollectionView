@@ -344,8 +344,8 @@ typedef NS_ENUM(NSInteger, CollectionViewAutoScrollType) {
                 self.isMoveing = YES;
                 [self.collectionView moveItemAtIndexPath:self.currentIndexPath toIndexPath:preferIndexPath];
 
-                if ([self.delagate respondsToSelector:@selector(collectionViewFlowLayout:moveItemAtIndexPath:toIndexPath:)]) {
-                    [self.delagate collectionViewFlowLayout:self moveItemAtIndexPath:self.currentIndexPath toIndexPath:preferIndexPath];
+                if ([self.delegate respondsToSelector:@selector(collectionViewFlowLayout:moveItemAtIndexPath:toIndexPath:)]) {
+                    [self.delegate collectionViewFlowLayout:self moveItemAtIndexPath:self.currentIndexPath toIndexPath:preferIndexPath];
                 }
                 // 完成之后更新transform
                 self.shootImageView.layer.transform = CATransform3DMakeTranslation(0, 0, preferIndexPath.row * 2 + 1);

@@ -12,7 +12,7 @@
 
 static NSString *const cellIden = @"CollectionViewCell";
 
-@interface ViewController () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CollectionViewFlowLayoutDelagate>
+@interface ViewController () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CollectionViewFlowLayoutDelegate>
 @property(nonatomic, strong) UICollectionView *collectionView;
 @property(nonatomic, strong) CollectionViewFlowLayout *flowLayout;
 @property(nonatomic, strong) NSMutableArray *dataSource;
@@ -43,7 +43,7 @@ static NSString *const cellIden = @"CollectionViewCell";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIden forIndexPath:indexPath];
     cell.gestureDelagate = self.flowLayout;
-    cell.textLabel.text = [NSString stringWithFormat:@"Cell Index: %@", self.dataSource[indexPath.row]];
+    cell.textLabel.text = [NSString stringWithFormat:@"Cell Index: %@", self.dataSource[(NSUInteger) indexPath.row]];
     return cell;
 }
 
@@ -56,7 +56,7 @@ static NSString *const cellIden = @"CollectionViewCell";
 #pragma mark -- -- -- -- -- - CollectionViewFlowLayout Delegate - -- -- -- -- --
 
 - (void)collectionViewFlowLayout:(CollectionViewFlowLayout *)flowLayout moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath {
-    [self.dataSource exchangeObjectAtIndex:indexPath.item withObjectAtIndex:newIndexPath.item];
+    [self.dataSource exchangeObjectAtIndex:(NSUInteger) indexPath.item withObjectAtIndex:(NSUInteger) newIndexPath.item];
 }
 
 #pragma mark -
@@ -65,7 +65,7 @@ static NSString *const cellIden = @"CollectionViewCell";
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         self.flowLayout = [CollectionViewFlowLayout new];
-        self.flowLayout.delagate = self;
+        self.flowLayout.delegate = self;
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 20, self.view.frame.size.width, self.view.frame.size.height - 20) collectionViewLayout:self.flowLayout];
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.delegate = self;
