@@ -13,10 +13,10 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.contentView.backgroundColor = [CollectionViewCell randomColor];
-    
+
     UILongPressGestureRecognizer *longPressGes = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressOnCell:)];
     [self addGestureRecognizer:longPressGes];
-    
+
     UIPanGestureRecognizer *panGes = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panOnCell:)];
     [self addGestureRecognizer:panGes];
     self.panGes = panGes;
@@ -38,6 +38,7 @@
 
 #pragma mark -
 #pragma mark -- -- -- -- -- - Event Response - -- -- -- -- --
+
 - (void)longPressOnCell:(UILongPressGestureRecognizer *)ges {
     if ([self.gestureDelagate respondsToSelector:@selector(collectionViewCell:handlerLongPressGesture:)]) {
         [self.gestureDelagate collectionViewCell:self handlerLongPressGesture:ges];
@@ -51,14 +52,12 @@
 }
 
 
-
 + (UIColor *)randomColor {
-    CGFloat hue = ( arc4random() % 256 / 256.0 );  //  0.0 to 1.0
-    CGFloat saturation = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from white
-    CGFloat brightness = ( arc4random() % 128 / 256.0 ) + 0.5;  //  0.5 to 1.0, away from black
+    CGFloat hue = (arc4random() % 256 / 256.0);  //  0.0 to 1.0
+    CGFloat saturation = (arc4random() % 128 / 256.0) + 0.5;  //  0.5 to 1.0, away from white
+    CGFloat brightness = (arc4random() % 128 / 256.0) + 0.5;  //  0.5 to 1.0, away from black
     return [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
 }
-
 
 
 @end

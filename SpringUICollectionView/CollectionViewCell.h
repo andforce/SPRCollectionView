@@ -12,14 +12,15 @@
 
 @protocol CollectionViewCellGestureDelegate <NSObject>
 - (void)collectionViewCell:(CollectionViewCell *)cell handlerLongPressGesture:(UILongPressGestureRecognizer *)ges;
+
 - (void)collectionViewCell:(CollectionViewCell *)cell handlerPanGesture:(UIPanGestureRecognizer *)ges;
 
 
 @end
 
 @interface CollectionViewCell : UICollectionViewCell
-@property (strong, nonatomic) IBOutlet UILabel *textLabel;
-@property (nonatomic, strong) UIPanGestureRecognizer *panGes;
+@property(strong, nonatomic) IBOutlet UILabel *textLabel;
+@property(nonatomic, strong) UIPanGestureRecognizer *panGes;
 
-@property(weak, nonatomic) id<CollectionViewCellGestureDelegate> gestureDelagate;
+@property(weak, nonatomic) id <CollectionViewCellGestureDelegate> gestureDelagate;
 @end

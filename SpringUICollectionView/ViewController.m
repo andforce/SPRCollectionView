@@ -10,12 +10,12 @@
 #import "CollectionViewFlowLayout.h"
 #import "CollectionViewCell.h"
 
-static NSString * const cellIden = @"CollectionViewCell";
+static NSString *const cellIden = @"CollectionViewCell";
 
-@interface ViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CollectionViewFlowLayoutDelagate>
-@property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) CollectionViewFlowLayout *flowLayout;
-@property (nonatomic, strong) NSMutableArray *dataSource;
+@interface ViewController () <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CollectionViewFlowLayoutDelagate>
+@property(nonatomic, strong) UICollectionView *collectionView;
+@property(nonatomic, strong) CollectionViewFlowLayout *flowLayout;
+@property(nonatomic, strong) NSMutableArray *dataSource;
 
 @end
 
@@ -26,7 +26,7 @@ static NSString * const cellIden = @"CollectionViewCell";
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self.view addSubview:self.collectionView];
-    
+
     self.dataSource = [NSMutableArray arrayWithCapacity:0];
     for (int i = 0; i < 20; i++) {
         [self.dataSource addObject:[NSString stringWithFormat:@"%d", i]];
@@ -35,30 +35,33 @@ static NSString * const cellIden = @"CollectionViewCell";
 
 #pragma mark -
 #pragma mark -- -- -- -- -- - UICollectView Delegate & DataSource - -- -- -- -- --
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return 20;
 }
 
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIden forIndexPath:indexPath];
     cell.gestureDelagate = self.flowLayout;
     cell.textLabel.text = [NSString stringWithFormat:@"Cell Index: %@", self.dataSource[indexPath.row]];
     return cell;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     [self.flowLayout collectionView:collectionView didSelectItemAtIndexPath:indexPath];
 }
 
 #pragma mark -
 #pragma mark -- -- -- -- -- - CollectionViewFlowLayout Delegate - -- -- -- -- --
+
 - (void)collectionViewFlowLayout:(CollectionViewFlowLayout *)flowLayout moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath {
     [self.dataSource exchangeObjectAtIndex:indexPath.item withObjectAtIndex:newIndexPath.item];
 }
 
 #pragma mark -
 #pragma mark -- -- -- -- -- - Get & Set - -- -- -- -- --
+
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         self.flowLayout = [CollectionViewFlowLayout new];
